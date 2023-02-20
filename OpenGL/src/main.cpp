@@ -14,6 +14,7 @@
 
 #include "graphics/models/cube.hpp"
 #include "graphics/models/lamp.hpp"
+#include "graphics/light.h"
 #include "graphics/shader.h"
 #include "graphics/texture.h"
 
@@ -80,6 +81,8 @@ int main()
     Cube cube(Material::mix(Material::gold, Material::emerald), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.75f));
     cube.init();
 
+    DirLight dirLight = { glm::vec3(-0.2f, -10.f, -0.3f), glm::vec3(0.1f), glm::vec3(0.4f), glm::vec3(0.45) };
+
     Lamp lamp(glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(-1.0f, -0.5f, -0.5f), glm::vec3(0.25f));
     lamp.init();
 
@@ -96,7 +99,8 @@ int main()
         // shader.set3Float("light.position", lamp.pos);
         shader.set3Float("viewPos", cameras[activeCam].cameraPos);
 
-        lamp.pointLight.render(shader);
+        dirLight.render(shader);
+        //lamp.pointLight.render(shader);
 
         // create transformation to screen
         glm::mat4 view = glm::mat4(1.0f);
