@@ -179,7 +179,7 @@ int main()
         cubes[i].cleanup();
     }
 
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < 4; ++i) {
         lamps[i].cleanup();
     }
 
@@ -190,6 +190,10 @@ int main()
 void process_input(double dt) {
     if (Keyboard::key(GLFW_KEY_ESCAPE)) {
         screen.setShouldClose(true);
+    }
+
+    if (Keyboard::keyWentDown(GLFW_KEY_L)) {
+        flashLightOn = !flashLightOn;
     }
 
     // change mix value
