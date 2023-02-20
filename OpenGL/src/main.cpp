@@ -12,7 +12,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Shader.h"
+#include "graphics/shader.h"
 
 #include "io/Keyboard.h"
 #include "io/Mouse.h"
@@ -86,8 +86,8 @@ int main()
 
     // shaders
 
-    Shader shader("assets/vertex_core.glsl", "assets/fragment_core.glsl");
-    Shader shader2("assets/vertex_core.glsl", "assets/fragment_core2.glsl");
+    Shader shader("assets/object.vs", "assets/object.fs");
+    Shader shader2("assets/object.vs", "assets/object.fs");
 
     float vertices[] = {
         // positions           texcoords
@@ -234,7 +234,7 @@ int main()
         model = glm::rotate(model, (float)glfwGetTime()* glm::radians(-55.0f), glm::vec3(0.5f));
         //view = glm::translate(view, glm::vec3(-x, -y, -z));
         view = cameras[activeCam].getViewMatrix();
-        projection = glm::perspective(glm::radians(cameras[activeCam].zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        projection = glm::perspective(glm::radians(cameras[activeCam].getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
         shader.activate();
 

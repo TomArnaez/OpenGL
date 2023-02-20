@@ -140,12 +140,11 @@
     <ClCompile Include="lib\glad.c" />
     <ClCompile Include="lib\stb.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\shader.cpp" />
+    <ClCompile Include="src\graphics\shader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="assets\fragment_core.glsl" />
-    <None Include="assets\fragment_core2.glsl" />
-    <None Include="assets\vertex_core.glsl" />
+    <None Include="assets\object.fs" />
+    <None Include="assets\object.vs" />
     <None Include="glfw3.dll" />
   </ItemGroup>
   <ItemGroup>
@@ -153,7 +152,7 @@
     <ClInclude Include="src\io\Joystick.h" />
     <ClInclude Include="src\io\Keyboard.h" />
     <ClInclude Include="src\io\Mouse.h" />
-    <ClInclude Include="src\shader.h" />
+    <ClInclude Include="src\graphics\shader.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\image1.jpg" />

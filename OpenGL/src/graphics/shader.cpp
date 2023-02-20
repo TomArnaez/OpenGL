@@ -1,6 +1,11 @@
-#include "Shader.h"
+#include "shader.h"
 
+Shader::Shader() {}
 Shader::Shader(const char* vertexShaderPath, const char* fragmentShaderPath) {
+	generate(vertexShaderPath, fragmentShaderPath);
+}
+
+void Shader::generate(const char* vertexShaderPath, const char* fragmentShaderPath) {
 	int success;
 	char infoLog[512];
 
