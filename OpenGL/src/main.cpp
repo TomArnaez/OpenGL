@@ -16,9 +16,10 @@
 
 #include "io/Keyboard.h"
 #include "io/Mouse.h"
+#include "io/Camera.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void process_input(GLFWwindow* window);
+void process_input(GLFWwindow* window, double dt);
 
 float mixVal = 0.5f;
 
@@ -26,6 +27,10 @@ glm::mat4 transform = glm::mat4(1.0f);
 
 unsigned int SCR_WIDTH = 800, SCR_HEIGHT = 600;
 float x, y, z;
+
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
 
 int main()
 {
@@ -69,13 +74,11 @@ int main()
     glfwSetMouseButtonCallback(window, Mouse::mouseButtonCallback);
     glfwSetScrollCallback(window, Mouse::mouseWheelCallback);
 
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
     glEnable(GL_DEPTH_TEST);
 
-    /*
-
-   shaders
-
-    */
+    // shaders
 
     Shader shader("assets/vertex_core.glsl", "assets/fragment_core.glsl");
     Shader shader2("assets/vertex_core.glsl", "assets/fragment_core2.glsl");
@@ -203,8 +206,11 @@ int main()
 
 
     while (!glfwWindowShouldClose(window)) {
+        double currentTime = glfwGetTime();
+        deltaTime = currentTime - lastFrame;
+        lastFrame = currentTime;
         // process input
-        process_input(window);
+        process_input(window, deltaTime);
 
         // render
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -220,8 +226,9 @@ int main()
         glm::mat4 projection = glm::mat4(1.0f);
 
         model = glm::rotate(model, (float)glfwGetTime()* glm::radians(-55.0f), glm::vec3(0.5f));
-        view = glm::translate(view, glm::vec3(-x, -y, -z));
-        projection = glm::perspective(glm::radians(90.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        //view = glm::translate(view, glm::vec3(-x, -y, -z));
+        view = camera.getViewMatrix();
+        projection = glm::perspective(glm::radians(camera.zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
         shader.activate();
 
@@ -262,8 +269,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     SCR_HEIGHT = height;
 }
 
-void process_input(GLFWwindow* window) {
-    if(Keyboard::key(GLFW_KEY_ESCAPE)) {
+void process_input(GLFWwindow* window, double dt) {
+    if (Keyboard::key(GLFW_KEY_ESCAPE)) {
         glfwSetWindowShouldClose(window, true);
     }
 
@@ -293,5 +300,35 @@ void process_input(GLFWwindow* window) {
     }
     if (Keyboard::key(GLFW_KEY_D)) {
         transform = glm::translate(transform, glm::vec3(0.1f, 0.0f, 0.0f));
+    }
+
+    // move camera
+    if (Keyboard::key(GLFW_KEY_W)) {
+        camera.updateCameraPos(CameraDirection::FORWARD, dt);
+    }
+    if (Keyboard::key(GLFW_KEY_A)) {
+        camera.updateCameraPos(CameraDirection::LEFT, dt);
+    }
+    if (Keyboard::key(GLFW_KEY_S)) {
+        camera.updateCameraPos(CameraDirection::BACKWARD, dt);
+    }
+    if (Keyboard::key(GLFW_KEY_D)) {
+        camera.updateCameraPos(CameraDirection::RIGHT, dt);
+    }
+    if (Keyboard::key(GLFW_KEY_SPACE)) {
+        camera.updateCameraPos(CameraDirection::UP, dt);
+    }
+    if (Keyboard::key(GLFW_KEY_LEFT_SHIFT)) {
+        camera.updateCameraPos(CameraDirection::DOWN, dt);
+    }
+
+    double dx = Mouse::getDX(), dy = Mouse::getDY();
+    if (dx != 0 || dy != 0) {
+        camera.updateCameraDirection(dx, dy);
+    }
+
+    double scrollDy = Mouse::getScrollDY();
+    if (scrollDy != 0) {
+        camera.updateCameraZoom(scrollDy);
     }
 }
