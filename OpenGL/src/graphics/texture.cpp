@@ -47,7 +47,7 @@ void Texture::load(bool flip)
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else {
-		std::cout << "Image not laoded at " << path << std::endl;
+		std::cout << "Image not loaded at " << path << std::endl;
 	}
 
 	stbi_image_free(data);

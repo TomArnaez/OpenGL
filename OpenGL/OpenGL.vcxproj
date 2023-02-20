@@ -168,6 +168,8 @@
     <ClInclude Include="src\io\screen.h" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="assets\flag.jpg" />
+    <Image Include="assets\flag_specular.jpg" />
     <Image Include="assets\image1.jpg" />
     <Image Include="assets\image2.png" />
   </ItemGroup>
