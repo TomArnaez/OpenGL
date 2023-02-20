@@ -133,6 +133,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\graphics\mesh.cpp" />
+    <ClCompile Include="src\graphics\model.cpp" />
     <ClCompile Include="src\graphics\texture.cpp" />
     <ClCompile Include="src\io\camera.cpp" />
     <ClCompile Include="src\io\keyboard.cpp" />
@@ -147,8 +149,12 @@
     <None Include="assets\object.fs" />
     <None Include="assets\object.vs" />
     <None Include="glfw3.dll" />
+    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\graphics\mesh.h" />
+    <ClInclude Include="src\graphics\model.h" />
+    <ClInclude Include="src\graphics\models\cube.hpp" />
     <ClInclude Include="src\graphics\texture.h" />
     <ClInclude Include="src\io\camera.h" />
     <ClInclude Include="src\io\keyboard.h" />
