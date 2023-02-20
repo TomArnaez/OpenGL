@@ -13,6 +13,7 @@
 #include <glm/gtc/type_ptr.hpp>  
 
 #include "graphics/models/cube.hpp"
+#include "graphics/models/lamp.hpp"
 #include "graphics/shader.h"
 #include "graphics/texture.h"
 
@@ -21,7 +22,6 @@
 #include "io/camera.h"
 #include "io/screen.h"
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void process_input(double dt);
 
 float mixVal = 0.5f;
@@ -31,8 +31,6 @@ glm::mat4 transform = glm::mat4(1.0f);
 unsigned int SCR_WIDTH = 800, SCR_HEIGHT = 600;
 
 Screen screen;
-
-float x, y, z;
 
 Camera cameras[2] = {
     Camera(glm::vec3(0.0f, 0.0f, 3.0f)),
@@ -77,9 +75,13 @@ int main()
     // shaders
 
     Shader shader("assets/object.vs", "assets/object.fs");
+    Shader lampShader("assets/object.vs", "assets/lamp.fs");
 
-    Cube cube(glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.75f));
+    Cube cube(Material::emerald, glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.75f));
     cube.init();
+
+    Lamp lamp(glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(-1.0f, -0.5f, -0.5f), glm::vec3(0.25f));
+    lamp.init();
 
     while (!screen.shouldClose()) {
         double currentTime = glfwGetTime();
@@ -91,7 +93,12 @@ int main()
         screen.update();
 
         shader.activate();
-        shader.setFloat("mixVal", mixVal);
+        shader.set3Float("light.position", lamp.pos);
+        shader.set3Float("viewPos", cameras[activeCam].cameraPos);
+
+        shader.set3Float("light.ambient", lamp.ambient);
+        shader.set3Float("light.diffuse", lamp.diffuse);
+        shader.set3Float("light.specular", lamp.specular);
 
         // create transformation to screen
         glm::mat4 view = glm::mat4(1.0f);
@@ -104,17 +111,16 @@ int main()
 
         cube.render(shader);
 
+        lampShader.activate();
+        lampShader.setMat4("view", view);
+        lampShader.setMat4("projection", projection);
+        lamp.render(lampShader);
+
         screen.newFrame();
     }
 
     glfwTerminate();
     return 0;
-}
-
-void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-    glViewport(0, 0, width, height);
-    SCR_WIDTH = width;
-    SCR_HEIGHT = height;
 }
 
 void process_input(double dt) {

@@ -60,6 +60,7 @@
     <None Include="assets\object.fs" />
     <None Include="assets\object.vs" />
     <None Include="README.md" />
+    <None Include="assets\lamp.fs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\graphics\shader.h">
@@ -90,6 +91,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\graphics\material.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\models\lamp.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
