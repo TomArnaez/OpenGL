@@ -62,7 +62,6 @@
     <None Include="glfw3.dll" />
     <None Include="assets\object.fs" />
     <None Include="assets\object.vs" />
-    <None Include="README.md" />
     <None Include="assets\lamp.fs" />
   </ItemGroup>
   <ItemGroup>

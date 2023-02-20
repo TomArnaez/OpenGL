@@ -152,7 +152,6 @@
     <None Include="assets\object.fs" />
     <None Include="assets\object.vs" />
     <None Include="glfw3.dll" />
-    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\graphics\light.h" />
