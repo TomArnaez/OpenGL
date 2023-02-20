@@ -13,19 +13,24 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "graphics/shader.h"
+#include "graphics/texture.h"
 
-#include "io/Keyboard.h"
-#include "io/Mouse.h"
-#include "io/Camera.h"
+#include "io/keyboard.h"
+#include "io/mouse.h"
+#include "io/camera.h"
+#include "io/screen.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void process_input(GLFWwindow* window, double dt);
+void process_input(double dt);
 
 float mixVal = 0.5f;
 
 glm::mat4 transform = glm::mat4(1.0f);
 
 unsigned int SCR_WIDTH = 800, SCR_HEIGHT = 600;
+
+Screen screen;
+
 float x, y, z;
 
 Camera cameras[2] = {
@@ -52,15 +57,11 @@ int main()
     glfwWidnowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "OpenGL Tutorial", NULL, NULL);
-
-    if (window == NULL) {
-        std::cout << "Could not create window" << std::endl;
+    if (!screen.init()) {
+        std::cout << "Could not create window." << std::endl;
         glfwTerminate();
         return -1;
     }
-
-    glfwMakeContextCurrent(window);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cout << "Failed to initialise GLAD" << std::endl;
@@ -68,19 +69,7 @@ int main()
         return -1;
     }
 
-    glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
-
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-
-
-    glfwSetKeyCallback(window, Keyboard::keyCallback);
-
-    glfwSetCursorPosCallback(window, Mouse::cursorPosCallback);
-    glfwSetMouseButtonCallback(window, Mouse::mouseButtonCallback);
-    glfwSetScrollCallback(window, Mouse::mouseWheelCallback);
-
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    screen.setParameters();
 
     glEnable(GL_DEPTH_TEST);
 
@@ -164,63 +153,30 @@ int main()
 
     // TEXTURES
 
-    unsigned int texture1, texture2;
+    Texture texture1("assets/image1.jpg", "texture1");
+    texture1.load();
+    Texture texture2("assets/image2.png", "texture2");
+    texture2.load();
 
-    glGenTextures(1, &texture1);
-    glBindTexture(GL_TEXTURE_2D, texture1);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-    // load image
-    int width, height, nChannels;
-    stbi_set_flip_vertically_on_load(true);
-    unsigned char* data = stbi_load("assets/image1.jpg", &width, &height, &nChannels, 0);
-
-    if (data) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-
-    stbi_image_free(data);
-
-    glGenTextures(1, &texture2);
-    glBindTexture(GL_TEXTURE_2D, texture2);
-
-    data = stbi_load("assets/image2.png", &width, &height, &nChannels, 0);
-
-    if (data) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glad_glGenerateMipmap(GL_TEXTURE_2D);
-    } else {
-            std::cout << "Failed to load texture" << std::endl;
-    }
 
     shader.activate();
-    shader.setInt("texture1", 0);
-    shader.setInt("texture2", 1);
+    shader.setInt("texture1", texture1.id);
+    shader.setInt("texture2", texture2.id);
 
     x = 0.0f;
     y = 0.0f;
     z = 3.0f;
 
 
-    while (!glfwWindowShouldClose(window)) {
+    while (!screen.shouldClose()) {
         double currentTime = glfwGetTime();
         deltaTime = currentTime - lastFrame;
         lastFrame = currentTime;
         // process input
-        process_input(window, deltaTime);
+        process_input(deltaTime);
 
         // render
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        screen.update();
        
         // draw shapes
         glBindVertexArray(VAO);
@@ -247,9 +203,9 @@ int main()
         //shader.setMat4("transform", transform);
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture1);
+        texture1.bind();
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, texture2);
+        texture2.bind();
 
 
         glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -258,8 +214,7 @@ int main()
         glBindVertexArray(0);
 
         // send new frame to window
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+        screen.newFrame();
     }
 
     glDeleteVertexArrays(1, &VAO);
@@ -275,9 +230,9 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     SCR_HEIGHT = height;
 }
 
-void process_input(GLFWwindow* window, double dt) {
+void process_input(double dt) {
     if (Keyboard::key(GLFW_KEY_ESCAPE)) {
-        glfwSetWindowShouldClose(window, true);
+        screen.setShouldClose(true);
     }
 
     // change mix value

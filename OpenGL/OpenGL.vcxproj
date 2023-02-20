@@ -133,12 +133,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\io\Camera.cpp" />
-    <ClCompile Include="src\io\Joystick.cpp" />
-    <ClCompile Include="src\io\Keyboard.cpp" />
-    <ClCompile Include="src\io\Mouse.cpp" />
+    <ClCompile Include="src\graphics\texture.cpp" />
+    <ClCompile Include="src\io\camera.cpp" />
+    <ClCompile Include="src\io\keyboard.cpp" />
+    <ClCompile Include="src\io\mouse.cpp" />
     <ClCompile Include="lib\glad.c" />
     <ClCompile Include="lib\stb.cpp" />
+    <ClCompile Include="src\io\screen.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\graphics\shader.cpp" />
   </ItemGroup>
@@ -148,11 +149,12 @@
     <None Include="glfw3.dll" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\io\Camera.h" />
-    <ClInclude Include="src\io\Joystick.h" />
-    <ClInclude Include="src\io\Keyboard.h" />
-    <ClInclude Include="src\io\Mouse.h" />
+    <ClInclude Include="src\graphics\texture.h" />
+    <ClInclude Include="src\io\camera.h" />
+    <ClInclude Include="src\io\keyboard.h" />
+    <ClInclude Include="src\io\mouse.h" />
     <ClInclude Include="src\graphics\shader.h" />
+    <ClInclude Include="src\io\screen.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\image1.jpg" />
