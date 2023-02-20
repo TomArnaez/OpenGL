@@ -28,7 +28,13 @@ glm::mat4 transform = glm::mat4(1.0f);
 unsigned int SCR_WIDTH = 800, SCR_HEIGHT = 600;
 float x, y, z;
 
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera cameras[2] = {
+    Camera(glm::vec3(0.0f, 0.0f, 3.0f)),
+    Camera(glm::vec3(10.0f, 10.0f, 10.0f))
+};
+
+int activeCam = 0;
+
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
@@ -227,8 +233,8 @@ int main()
 
         model = glm::rotate(model, (float)glfwGetTime()* glm::radians(-55.0f), glm::vec3(0.5f));
         //view = glm::translate(view, glm::vec3(-x, -y, -z));
-        view = camera.getViewMatrix();
-        projection = glm::perspective(glm::radians(camera.zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        view = cameras[activeCam].getViewMatrix();
+        projection = glm::perspective(glm::radians(cameras[activeCam].zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
         shader.activate();
 
@@ -289,6 +295,10 @@ void process_input(GLFWwindow* window, double dt) {
         }
     }
 
+    if (Keyboard::keyWentDown(GLFW_KEY_TAB)) {
+        activeCam += (activeCam == 0) ? 1 : -1;
+    }
+
     if (Keyboard::key(GLFW_KEY_W)) {
         transform = glm::translate(transform, glm::vec3(0.0f, 0.1f, 0.0f));
     }
@@ -304,31 +314,31 @@ void process_input(GLFWwindow* window, double dt) {
 
     // move camera
     if (Keyboard::key(GLFW_KEY_W)) {
-        camera.updateCameraPos(CameraDirection::FORWARD, dt);
+        cameras[activeCam].updateCameraPos(CameraDirection::FORWARD, dt);
     }
     if (Keyboard::key(GLFW_KEY_A)) {
-        camera.updateCameraPos(CameraDirection::LEFT, dt);
+        cameras[activeCam].updateCameraPos(CameraDirection::LEFT, dt);
     }
     if (Keyboard::key(GLFW_KEY_S)) {
-        camera.updateCameraPos(CameraDirection::BACKWARD, dt);
+        cameras[activeCam].updateCameraPos(CameraDirection::BACKWARD, dt);
     }
     if (Keyboard::key(GLFW_KEY_D)) {
-        camera.updateCameraPos(CameraDirection::RIGHT, dt);
+        cameras[activeCam].updateCameraPos(CameraDirection::RIGHT, dt);
     }
     if (Keyboard::key(GLFW_KEY_SPACE)) {
-        camera.updateCameraPos(CameraDirection::UP, dt);
+        cameras[activeCam].updateCameraPos(CameraDirection::UP, dt);
     }
     if (Keyboard::key(GLFW_KEY_LEFT_SHIFT)) {
-        camera.updateCameraPos(CameraDirection::DOWN, dt);
+        cameras[activeCam].updateCameraPos(CameraDirection::DOWN, dt);
     }
 
     double dx = Mouse::getDX(), dy = Mouse::getDY();
     if (dx != 0 || dy != 0) {
-        camera.updateCameraDirection(dx, dy);
+        cameras[activeCam].updateCameraDirection(dx, dy);
     }
 
     double scrollDy = Mouse::getScrollDY();
     if (scrollDy != 0) {
-        camera.updateCameraZoom(scrollDy);
+        cameras[activeCam].updateCameraZoom(scrollDy);
     }
 }
