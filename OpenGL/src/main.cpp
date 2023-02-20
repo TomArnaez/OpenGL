@@ -77,7 +77,7 @@ int main()
     Shader shader("assets/object.vs", "assets/object.fs");
     Shader lampShader("assets/object.vs", "assets/lamp.fs");
 
-    Cube cube(Material::emerald, glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.75f));
+    Cube cube(Material::mix(Material::gold, Material::emerald), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.75f));
     cube.init();
 
     Lamp lamp(glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(-1.0f, -0.5f, -0.5f), glm::vec3(0.25f));
@@ -93,12 +93,10 @@ int main()
         screen.update();
 
         shader.activate();
-        shader.set3Float("light.position", lamp.pos);
+        // shader.set3Float("light.position", lamp.pos);
         shader.set3Float("viewPos", cameras[activeCam].cameraPos);
 
-        shader.set3Float("light.ambient", lamp.ambient);
-        shader.set3Float("light.diffuse", lamp.diffuse);
-        shader.set3Float("light.specular", lamp.specular);
+        lamp.pointLight.render(shader);
 
         // create transformation to screen
         glm::mat4 view = glm::mat4(1.0f);
@@ -145,19 +143,6 @@ void process_input(double dt) {
 
     if (Keyboard::keyWentDown(GLFW_KEY_TAB)) {
         activeCam += (activeCam == 0) ? 1 : -1;
-    }
-
-    if (Keyboard::key(GLFW_KEY_W)) {
-        transform = glm::translate(transform, glm::vec3(0.0f, 0.1f, 0.0f));
-    }
-    if (Keyboard::key(GLFW_KEY_A)) {
-        transform = glm::translate(transform, glm::vec3(-0.1f, 0.0f, 0.0f));
-    }
-    if (Keyboard::key(GLFW_KEY_S)) {
-        transform = glm::translate(transform, glm::vec3(0.0f, -0.1f, 0.0f));
-    }
-    if (Keyboard::key(GLFW_KEY_D)) {
-        transform = glm::translate(transform, glm::vec3(0.1f, 0.0f, 0.0f));
     }
 
     // move camera

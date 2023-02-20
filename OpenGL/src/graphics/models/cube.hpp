@@ -67,12 +67,11 @@ public:
             indices[i] = i;
         }
 
-        Texture tex0("assets/image1.jpg", "texture0");
-        tex0.load();
-        Texture tex1("assets/image2.png", "texture1");
-        tex1.load();
+        Texture flag("assets/flag.jpg", "material.diffuse");
+        flag.load();
+        Texture flagSpec("assets/flag_specular.jpg", "material.specular");
 
-        meshes.push_back(Mesh(Vertex::genList(vertices, noVertices), indices, { tex0, tex1 }));
+        meshes.push_back(Mesh(Vertex::genList(vertices, noVertices), indices, { flag, flagSpec }));
     }
 
     void render(Shader shader) {
@@ -83,8 +82,8 @@ public:
         shader.setMat4("model", model);
 
         shader.set3Float("material.ambient", material.ambient);
-        shader.set3Float("material.diffuse", material.diffuse);
-        shader.set3Float("material.specular", material.specular);
+        //shader.set3Float("material.diffuse", material.diffuse);
+        //shader.set3Float("material.specular", material.specular);
         shader.setFloat("material.shininess", material.shininess);
 
         Model::render(shader);
