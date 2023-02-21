@@ -1,9 +1,13 @@
 #version 330 core
 struct Material {
-	sampler2D diffuse;
-	sampler2D specular;
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
 	float shininess;
 };
+
+uniform sampler2D diffuse0;
+uniform sampler2D specular0;
 
 struct DirLight {
 	vec3 direction;
@@ -66,8 +70,8 @@ void main() {
 	// properties
 	vec3 norm = normalize(Normal);
 	vec3 viewDir = normalize(viewPos - FragPos);
-	vec3 texDiff = vec3(texture(material.diffuse, TexCoord));
-	vec3 texSpec = vec3(texture(material.specular, TexCoord));
+	vec3 texDiff = vec3(texture(diffuse0, TexCoord));
+	vec3 texSpec = vec3(texture(specular0, TexCoord));
 
 	vec3 result;
 
