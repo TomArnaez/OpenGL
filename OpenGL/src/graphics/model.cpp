@@ -1,7 +1,7 @@
 #include "model.h"
 
-Model::Model(glm::vec3 pos, glm::vec3 size)
-	: pos(pos), size(size) {}
+Model::Model(glm::vec3 pos, glm::vec3 size, bool noTex)
+	: pos(pos), size(size), noTex(noTex) {}
 
 void Model::init()
 {
@@ -104,6 +104,18 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 	// process material
 	if (mesh->mMaterialIndex >= 0) {
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+
+		if (noTex) {
+			// diffuse color
+			aiColor4D diff(1.0f);
+			aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &diff);
+
+			// specular color
+			aiColor4D spec(1.0f);
+			aiGetMaterialColor(material, AI_MATKEY_COLOR_SPECULAR, &spec);
+
+			return Mesh(vertices, indices, diff, spec);
+		}
 
 		// diffuse maps
 		std::vector<Texture> diffuseMaps = loadTextures(material, aiTextureType_DIFFUSE);
