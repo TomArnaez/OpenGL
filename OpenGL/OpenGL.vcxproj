@@ -146,6 +146,9 @@
     <ClCompile Include="src\io\screen.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\graphics\shader.cpp" />
+    <ClCompile Include="src\physics\environment.cpp" />
+    <ClCompile Include="src\physics\rigidbody.cpp" />
+    <ClCompile Include="src\physics\rigidbody.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\lamp.fs" />
@@ -154,18 +157,21 @@
     <None Include="glfw3.dll" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\graphics\models\gun.hpp" />
     <ClInclude Include="src\graphics\light.h" />
     <ClInclude Include="src\graphics\material.h" />
     <ClInclude Include="src\graphics\mesh.h" />
     <ClInclude Include="src\graphics\model.h" />
     <ClInclude Include="src\graphics\models\cube.hpp" />
     <ClInclude Include="src\graphics\models\lamp.hpp" />
+    <ClInclude Include="src\graphics\models\sphere.hpp" />
     <ClInclude Include="src\graphics\texture.h" />
     <ClInclude Include="src\io\camera.h" />
     <ClInclude Include="src\io\keyboard.h" />
     <ClInclude Include="src\io\mouse.h" />
     <ClInclude Include="src\graphics\shader.h" />
     <ClInclude Include="src\io\screen.h" />
+    <ClInclude Include="src\physics\environment.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\flag.jpg" />

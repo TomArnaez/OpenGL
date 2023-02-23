@@ -29,10 +29,10 @@ public:
 		pointLight({ pos, k0, k1, k2, ambient, diffuse, specular }),
 		Cube(pos, size) {}
 
-	void render(Shader shader) {
+	void render(Shader shader, float dt) {
 		// set light color
 		shader.set3Float("lightColor", lightColor);
-		Cube::render(shader);
+		Cube::render(shader, dt);
 	}
 };
 

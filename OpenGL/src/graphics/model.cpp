@@ -1,18 +1,25 @@
 #include "model.h"
+#include "../physics/environment.h"
 
 Model::Model(glm::vec3 pos, glm::vec3 size, bool noTex)
-	: pos(pos), size(size), noTex(noTex) {}
+	: pos(pos), size(size), noTex(noTex) {
+	rb.pos = pos;
+	rb.acceleration = Environment::gravitationalAcceleration;
+}
 
 void Model::init()
 {
 }
 
-void Model::render(Shader shader)
+void Model::render(Shader shader, float dt, bool setModel)
 {
-	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, pos);
-	model = glm::scale(model, size);
-	shader.setMat4("model", model);
+	rb.update(dt);
+	if (setModel) {
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, rb.pos);
+		model = glm::scale(model, size);
+		shader.setMat4("model", model);
+	}
 
 	shader.setFloat("material.shininess", 0.5f);
 
