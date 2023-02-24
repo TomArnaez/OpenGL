@@ -132,6 +132,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\io\Joystick.cpp" />
+    <ClCompile Include="src\io\Keyboard.cpp" />
+    <ClCompile Include="src\io\Mouse.cpp" />
     <ClCompile Include="lib\glad.c" />
     <ClCompile Include="lib\stb.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -144,6 +147,9 @@
     <None Include="glfw3.dll" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\io\Joystick.h" />
+    <ClInclude Include="src\io\Keyboard.h" />
+    <ClInclude Include="src\io\Mouse.h" />
     <ClInclude Include="src\shader.h" />
   </ItemGroup>
   <ItemGroup>

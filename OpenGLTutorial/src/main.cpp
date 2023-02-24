@@ -15,10 +15,15 @@
 
 #include "Shader.h"
 
+#include "io/Keyboard.h"
+#include "io/Mouse.h"
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void process_input(GLFWwindow* window);
 
 float mixVal = 0.5f;
+
+glm::mat4 transform = glm::mat4(1.0f);
 
 int main()
 {
@@ -59,6 +64,12 @@ int main()
        shaders
 
     */
+
+    glfwSetKeyCallback(window, Keyboard::keyCallback);
+
+    glfwSetCursorPosCallback(window, Mouse::cursorPosCallback);
+    glfwSetMouseButtonCallback(window, Mouse::mouseButtonCallback);
+    glfwSetScrollCallback(window, Mouse::mouseWheelCallback);
 
     Shader shader("assets/vertex_core.glsl", "assets/fragment_core.glsl");
     Shader shader2("assets/vertex_core.glsl", "assets/fragment_core2.glsl");
@@ -180,6 +191,7 @@ int main()
         glBindVertexArray(VAO);
         shader.activate();
         shader.setFloat("mixVal", mixVal);
+        shader.setMat4("transform", transform);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1);
@@ -224,22 +236,35 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 }
 
 void process_input(GLFWwindow* window) {
-    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+    if(Keyboard::key(GLFW_KEY_ESCAPE)) {
         glfwSetWindowShouldClose(window, true);
     }
 
     // change mix value
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+    if (Keyboard::keyWentDown(GLFW_KEY_UP)) {
         mixVal += .05f;
         if (mixVal > 1) {
             mixVal = 1.0f;
         }
     }
 
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+    if (Keyboard::keyWentDown(GLFW_KEY_DOWN)) {
         mixVal -= .05f;
         if (mixVal < 0) {
             mixVal = 0.0f;
         }
+    }
+
+    if (Keyboard::key(GLFW_KEY_W)) {
+        transform = glm::translate(transform, glm::vec3(0.0f, 0.1f, 0.0f));
+    }
+    if (Keyboard::key(GLFW_KEY_A)) {
+        transform = glm::translate(transform, glm::vec3(-0.1f, 0.0f, 0.0f));
+    }
+    if (Keyboard::key(GLFW_KEY_S)) {
+        transform = glm::translate(transform, glm::vec3(0.0f, -0.1f, 0.0f));
+    }
+    if (Keyboard::key(GLFW_KEY_D)) {
+        transform = glm::translate(transform, glm::vec3(0.1f, 0.0f, 0.0f));
     }
 }
