@@ -17,7 +17,6 @@
 #include "graphics/models/gun.hpp"
 #include "graphics/models/sphere.hpp"
 
-
 #include "graphics/model.h"
 #include "graphics/light.h"
 #include "graphics/shader.h"
@@ -28,8 +27,10 @@
 #include "io/camera.h"
 #include "io/screen.h"
 
+#include "physics/environment.h"
 
-void process_input(double dt);
+
+void processInput(double dt);
 
 float mixVal = 0.5f;
 
@@ -47,10 +48,12 @@ Camera cameras[2] = {
 
 int activeCam = 0;
 
-float deltaTime = 0.0f;
+float dt = 0.0f;
 float lastFrame = 0.0f;
 
 bool flashLightOn = true;
+
+std::vector<Sphere> launchObjects;
 
 int main() {
 	int success;
@@ -92,9 +95,6 @@ int main() {
 	//Gun g;
 	//g.loadModel("assets/models/m4a1/scene.gltf");
 
-	Sphere sphere(glm::vec3(0.0f), glm::vec3(0.25f));
-	sphere.init();
-
 	// LIGHTS
 	DirLight dirLight = { glm::vec3(-0.2f, -1.0f, -0.3f), glm::vec4(0.1f, 0.1f, 0.1f, 1.0f), glm::vec4(0.4f, 0.4f, 0.4f, 1.0f), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f) };
 
@@ -104,6 +104,7 @@ int main() {
 		glm::vec3(-4.0f,  2.0f, -12.0f),
 		glm::vec3(0.0f,  0.0f, -3.0f)
 	};
+
 	Lamp lamps[4];
 	for (unsigned int i = 0; i < 4; i++) {
 		lamps[i] = Lamp(glm::vec3(1.0f),
@@ -124,11 +125,11 @@ int main() {
 	while (!screen.shouldClose()) {
 		// calculate dt
 		double currentTime = glfwGetTime();
-		deltaTime = currentTime - lastFrame;
+		dt = currentTime - lastFrame;
 		lastFrame = currentTime;
 
 		// process input
-		process_input(deltaTime);
+		processInput(dt);
 
 		// render
 		screen.update();
@@ -166,32 +167,43 @@ int main() {
 		shader.setMat4("view", view);
 		shader.setMat4("projection", projection);
 
-		sphere.render(shader, deltaTime);
-
+		for (Sphere &sphere : launchObjects) {
+			sphere.render(shader, dt);
+		}
+ 
 		lampShader.activate();
 		lampShader.setMat4("view", view);
 		lampShader.setMat4("projection", projection);
 
 		for (unsigned int i = 0; i < 4; i++) {
-			lamps[i].render(lampShader, deltaTime);
+			lamps[i].render(lampShader, dt);
 		}
 
 		// send new frame to window
 		screen.newFrame();
 	}
 
-	sphere.cleanup();
-
 	for (unsigned int i = 0; i < 4; i++) {
 		lamps[i].cleanup();
+	}
+
+	for (Sphere sphere : launchObjects) {
+		sphere.cleanup();
 	}
 
 	glfwTerminate();
 	return 0;
 }
 
+void launchItem(float dt) {
+	Sphere newSphere(Camera::defaultCamera.cameraPos, glm::vec3(0.25f));
+	newSphere.init();
+	newSphere.rb.applyAcceleration(Environment::gravitationalAcceleration);
+	newSphere.rb.applyImpulse(Camera::defaultCamera.cameraFront, 10000.0f, dt);
+	launchObjects.push_back(newSphere);
+}
 
-void process_input(double dt) {
+void processInput(double dt) {
     if (Keyboard::key(GLFW_KEY_ESCAPE)) {
         screen.setShouldClose(true);
     }
@@ -248,4 +260,8 @@ void process_input(double dt) {
     if (scrollDy != 0) {
         Camera::defaultCamera.updateCameraZoom(scrollDy);
     }
+
+	if (Keyboard::keyWentDown(GLFW_KEY_G)) {
+		launchItem(dt);
+	}
 }

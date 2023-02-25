@@ -24,7 +24,8 @@ void RigidBody::applyForce(glm::vec3 direction, float magnitude)
 void RigidBody::applyAcceleration(glm::vec3 a) {
 	acceleration += a;
 }
-void applyAcceleration(glm::vec3 direction, float magnitude) {
+
+void RigidBody::applyAcceleration(glm::vec3 direction, float magnitude) {
 	applyAcceleration(direction * magnitude);
 }
 
