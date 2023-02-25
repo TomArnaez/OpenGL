@@ -7,6 +7,8 @@
 #include <sstream>
 #include <streambuf>
 #include <string>
+#include <vector>
+#include <stack>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -53,7 +55,7 @@ float lastFrame = 0.0f;
 
 bool flashLightOn = true;
 
-std::vector<Sphere> launchObjects;
+SphereArray launchObjects;
 
 int main() {
 	int success;
@@ -95,6 +97,8 @@ int main() {
 	//Gun g;
 	//g.loadModel("assets/models/m4a1/scene.gltf");
 
+	launchObjects.init();
+
 	// LIGHTS
 	DirLight dirLight = { glm::vec3(-0.2f, -1.0f, -0.3f), glm::vec4(0.1f, 0.1f, 0.1f, 1.0f), glm::vec4(0.4f, 0.4f, 0.4f, 1.0f), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f) };
 
@@ -105,14 +109,32 @@ int main() {
 		glm::vec3(0.0f,  0.0f, -3.0f)
 	};
 
-	Lamp lamps[4];
+	glm::vec4 ambient = glm::vec4(0.05f, 0.05f, 0.05f, 1.0f);
+	glm::vec4 diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 1.0f);
+	glm::vec4 specular = glm::vec4(1.0f);
+	float k0 = 1.0f;
+	float k1 = 0.09f;
+	float k2 = 0.32f;
+
+	/*Lamp lamps[4];
 	for (unsigned int i = 0; i < 4; i++) {
 		lamps[i] = Lamp(glm::vec3(1.0f),
-			glm::vec4(0.05f, 0.05f, 0.05f, 1.0f), glm::vec4(0.8f, 0.8f, 0.8f, 1.0f), glm::vec4(1.0f),
-			1.0f, 0.07f, 0.032f,
+			ambient, diffuse, specular,
+			k0, k1, k2,
 			pointLightPositions[i], glm::vec3(0.25f));
 		lamps[i].init();
+	}*/
+
+	LampArray lamps;
+	lamps.init();
+	for (unsigned int i = 0; i < 4; i++) {
+		lamps.lightInstances.push_back({
+			pointLightPositions[i],
+			k0, k1, k2,
+			ambient, diffuse, specular
+			});
 	}
+
 
 	SpotLight s = {
 		Camera::defaultCamera.cameraPos, Camera::defaultCamera.cameraFront,
@@ -142,8 +164,9 @@ int main() {
 		dirLight.render(shader);
 
 		for (unsigned int i = 0; i < 4; i++) {
-			lamps[i].pointLight.render(shader, i);
+			lamps.lightInstances[i].render(shader, i);
 		}
+
 		shader.setInt("noPointLights", 4);
 
 		if (flashLightOn) {
@@ -167,40 +190,37 @@ int main() {
 		shader.setMat4("view", view);
 		shader.setMat4("projection", projection);
 
-		for (Sphere &sphere : launchObjects) {
-			sphere.render(shader, dt);
+
+		if (launchObjects.instances.size() > 0) {
+
+			launchObjects.render(shader, dt);
 		}
  
 		lampShader.activate();
 		lampShader.setMat4("view", view);
 		lampShader.setMat4("projection", projection);
 
-		for (unsigned int i = 0; i < 4; i++) {
-			lamps[i].render(lampShader, dt);
-		}
+		lamps.render(lampShader, dt);
 
 		// send new frame to window
 		screen.newFrame();
 	}
 
 	for (unsigned int i = 0; i < 4; i++) {
-		lamps[i].cleanup();
+		lamps.cleanup();
 	}
 
-	for (Sphere sphere : launchObjects) {
-		sphere.cleanup();
-	}
+	launchObjects.cleanup();
 
 	glfwTerminate();
 	return 0;
 }
 
 void launchItem(float dt) {
-	Sphere newSphere(Camera::defaultCamera.cameraPos, glm::vec3(0.25f));
-	newSphere.init();
-	newSphere.rb.applyAcceleration(Environment::gravitationalAcceleration);
-	newSphere.rb.applyImpulse(Camera::defaultCamera.cameraFront, 10000.0f, dt);
-	launchObjects.push_back(newSphere);
+	RigidBody rb(1.0f, Camera::defaultCamera.cameraPos);
+	rb.applyImpulse(Camera::defaultCamera.cameraFront, 10000.f, dt);
+	rb.applyAcceleration(Environment::gravitationalAcceleration);
+	launchObjects.instances.push_back(rb);
 }
 
 void processInput(double dt) {

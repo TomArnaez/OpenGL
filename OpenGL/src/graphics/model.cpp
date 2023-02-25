@@ -1,19 +1,17 @@
 #include "model.h"
+
 #include "../physics/environment.h"
 
+#include <iostream>
+
 Model::Model(glm::vec3 pos, glm::vec3 size, bool noTex)
-	: pos(pos), size(size), noTex(noTex) {
+	: size(size), noTex(noTex) {
 	rb.pos = pos;
-	rb.acceleration = Environment::gravitationalAcceleration;
 }
 
-void Model::init()
-{
-}
-
-void Model::render(Shader shader, float dt, bool setModel)
-{
+void Model::render(Shader shader, float dt, bool setModel) {
 	rb.update(dt);
+
 	if (setModel) {
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, rb.pos);
@@ -23,33 +21,31 @@ void Model::render(Shader shader, float dt, bool setModel)
 
 	shader.setFloat("material.shininess", 0.5f);
 
-	for (Mesh mesh : meshes) {
-		mesh.render(shader);
+	for (unsigned int i = 0; i < meshes.size(); i++) {
+		meshes[i].render(shader);
 	}
 }
 
-void Model::cleanup()
-{
-	for (Mesh mesh : meshes) {
-		mesh.cleanup();
+void Model::cleanup() {
+	for (unsigned int i = 0; i < meshes.size(); i++) {
+		meshes[i].cleanup();
 	}
 }
 
 void Model::loadModel(std::string path) {
 	Assimp::Importer import;
-	// flip image to read correctly
 	const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
 		std::cout << "Could not load model at " << path << std::endl << import.GetErrorString() << std::endl;
 		return;
- 	}
+	}
 
 	directory = path.substr(0, path.find_last_of("/"));
+
 	processNode(scene->mRootNode, scene);
 }
 
-// tree pre-processing
 void Model::processNode(aiNode* node, const aiScene* scene) {
 	// process all meshes
 	for (unsigned int i = 0; i < node->mNumMeshes; i++) {
@@ -79,14 +75,14 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 			mesh->mVertices[i].z
 		);
 
-		// noraml vectors
+		// normal vectors
 		vertex.normal = glm::vec3(
 			mesh->mNormals[i].x,
 			mesh->mNormals[i].y,
 			mesh->mNormals[i].z
 		);
 
-		// textures (assimp stores multiple textures per mesh)
+		// textures
 		if (mesh->mTextureCoords[0]) {
 			vertex.texCoord = glm::vec2(
 				mesh->mTextureCoords[0][i].x,
@@ -142,7 +138,6 @@ std::vector<Texture> Model::loadTextures(aiMaterial* mat, aiTextureType type) {
 	for (unsigned int i = 0; i < mat->GetTextureCount(type); i++) {
 		aiString str;
 		mat->GetTexture(type, i, &str);
-		std::cout << str.C_Str() << std::endl;
 
 		// prevent duplicate loading
 		bool skip = false;
@@ -161,7 +156,7 @@ std::vector<Texture> Model::loadTextures(aiMaterial* mat, aiTextureType type) {
 			textures.push_back(tex);
 			textures_loaded.push_back(tex);
 		}
- 	}
+	}
 
 	return textures;
 }

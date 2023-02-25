@@ -164,6 +164,7 @@
     <ClInclude Include="src\graphics\model.h" />
     <ClInclude Include="src\graphics\models\cube.hpp" />
     <ClInclude Include="src\graphics\models\lamp.hpp" />
+    <ClInclude Include="src\graphics\models\modelarray.hpp" />
     <ClInclude Include="src\graphics\models\sphere.hpp" />
     <ClInclude Include="src\graphics\texture.h" />
     <ClInclude Include="src\io\camera.h" />
