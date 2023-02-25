@@ -1,59 +1,41 @@
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <stb/stb_image.h>
 
-#include <fstream>
-#include <sstream>
-#include <streambuf>
 #include <string>
 #include <vector>
 #include <stack>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>  
+
+#include "graphics/shader.h"
+#include "graphics/texture.h"
+#include "graphics/model.h"
+#include "graphics/light.h"
 
 #include "graphics/models/cube.hpp"
 #include "graphics/models/lamp.hpp"
 #include "graphics/models/gun.hpp"
 #include "graphics/models/sphere.hpp"
 
-#include "graphics/model.h"
-#include "graphics/light.h"
-#include "graphics/shader.h"
-#include "graphics/texture.h"
+#include "physics/environment.h"
 
 #include "io/keyboard.h"
 #include "io/mouse.h"
-#include "io/camera.h"
 #include "io/screen.h"
-
-#include "physics/environment.h"
-
+#include "io/camera.h"
 
 void processInput(double dt);
 
-float mixVal = 0.5f;
-
-glm::mat4 transform = glm::mat4(1.0f);
-
 Screen screen;
 
-// setup default
 Camera Camera::defaultCamera(glm::vec3(0.0f, 0.0f, 0.0f));
 
-Camera cameras[2] = {
-    Camera(glm::vec3(0.0f, 0.0f, 0.0f)),
-    Camera(glm::vec3(10.0f, 10.0f, 10.0f))
-};
+double dt = 0.0f; // tme btwn frames
+double lastFrame = 0.0f; // time of last frame
 
-int activeCam = 0;
-
-float dt = 0.0f;
-float lastFrame = 0.0f;
-
-bool flashLightOn = true;
+bool flashlightOn = false;
 
 SphereArray launchObjects;
 
@@ -94,9 +76,6 @@ int main() {
 	Shader lampShader("assets/object.vs", "assets/lamp.fs");
 
 	// MODELS==============================
-	//Gun g;
-	//g.loadModel("assets/models/m4a1/scene.gltf");
-
 	launchObjects.init();
 
 	// LIGHTS
@@ -114,7 +93,7 @@ int main() {
 	glm::vec4 specular = glm::vec4(1.0f);
 	float k0 = 1.0f;
 	float k1 = 0.09f;
-	float k2 = 0.32f;
+	float k2 = 0.032f;
 
 	/*Lamp lamps[4];
 	for (unsigned int i = 0; i < 4; i++) {
@@ -134,7 +113,6 @@ int main() {
 			ambient, diffuse, specular
 			});
 	}
-
 
 	SpotLight s = {
 		Camera::defaultCamera.cameraPos, Camera::defaultCamera.cameraFront,
@@ -166,10 +144,9 @@ int main() {
 		for (unsigned int i = 0; i < 4; i++) {
 			lamps.lightInstances[i].render(shader, i);
 		}
-
 		shader.setInt("noPointLights", 4);
 
-		if (flashLightOn) {
+		if (flashlightOn) {
 			s.position = Camera::defaultCamera.cameraPos;
 			s.direction = Camera::defaultCamera.cameraFront;
 			s.render(shader, 0);
@@ -190,12 +167,24 @@ int main() {
 		shader.setMat4("view", view);
 		shader.setMat4("projection", projection);
 
+		/*
+		std::stack<int> removeObjects;
+		for (int i = 0; i < launchObjects.instances.size(); i++) {
+			if (glm::length(Camera::defaultCamera.cameraPos - launchObjects.instances[i].pos) > 50.0f) {
+				removeObjects.push(i);
+				continue;
+			}
+		}
+		for (int i = 0; i < removeObjects.size(); i++) {
+			launchObjects.instances.erase(launchObjects.instances.begin() + removeObjects.top());
+			removeObjects.pop();
+		}
+		*/
 
 		if (launchObjects.instances.size() > 0) {
-
 			launchObjects.render(shader, dt);
 		}
- 
+
 		lampShader.activate();
 		lampShader.setMat4("view", view);
 		lampShader.setMat4("projection", projection);
@@ -204,11 +193,10 @@ int main() {
 
 		// send new frame to window
 		screen.newFrame();
+		glfwPollEvents();
 	}
 
-	for (unsigned int i = 0; i < 4; i++) {
-		lamps.cleanup();
-	}
+	lamps.cleanup();
 
 	launchObjects.cleanup();
 
@@ -218,70 +206,41 @@ int main() {
 
 void launchItem(float dt) {
 	RigidBody rb(1.0f, Camera::defaultCamera.cameraPos);
-	rb.applyImpulse(Camera::defaultCamera.cameraFront, 10000.f, dt);
+	rb.applyImpulse(Camera::defaultCamera.cameraFront, 10000.0f, dt);
 	rb.applyAcceleration(Environment::gravitationalAcceleration);
 	launchObjects.instances.push_back(rb);
 }
 
 void processInput(double dt) {
-    if (Keyboard::key(GLFW_KEY_ESCAPE)) {
-        screen.setShouldClose(true);
-    }
+	if (Keyboard::key(GLFW_KEY_ESCAPE)) {
+		screen.setShouldClose(true);
+	}
 
-    if (Keyboard::keyWentDown(GLFW_KEY_L)) {
-        flashLightOn = !flashLightOn;
-    }
+	if (Keyboard::keyWentDown(GLFW_KEY_L)) {
+		flashlightOn = !flashlightOn;
+	}
 
-    // change mix value
-    if (Keyboard::keyWentDown(GLFW_KEY_UP)) {
-        mixVal += .05f;
-        if (mixVal > 1) {
-            mixVal = 1.0f;
-        }
-    }
+	// move camera
+	if (Keyboard::key(GLFW_KEY_W)) {
+		Camera::defaultCamera.updateCameraPos(CameraDirection::FORWARD, dt);
+	}
+	if (Keyboard::key(GLFW_KEY_S)) {
+		Camera::defaultCamera.updateCameraPos(CameraDirection::BACKWARD, dt);
+	}
+	if (Keyboard::key(GLFW_KEY_D)) {
+		Camera::defaultCamera.updateCameraPos(CameraDirection::RIGHT, dt);
+	}
+	if (Keyboard::key(GLFW_KEY_A)) {
+		Camera::defaultCamera.updateCameraPos(CameraDirection::LEFT, dt);
+	}
+	if (Keyboard::key(GLFW_KEY_SPACE)) {
+		Camera::defaultCamera.updateCameraPos(CameraDirection::UP, dt);
+	}
+	if (Keyboard::key(GLFW_KEY_LEFT_SHIFT)) {
+		Camera::defaultCamera.updateCameraPos(CameraDirection::DOWN, dt);
+	}
 
-    if (Keyboard::keyWentDown(GLFW_KEY_DOWN)) {
-        mixVal -= .05f;
-        if (mixVal < 0) {
-            mixVal = 0.0f;
-        }
-    }
-
-    if (Keyboard::keyWentDown(GLFW_KEY_TAB)) {
-        activeCam += (activeCam == 0) ? 1 : -1;
-    }
-
-    // move camera
-    if (Keyboard::key(GLFW_KEY_W)) {
-        Camera::defaultCamera.updateCameraPos(CameraDirection::FORWARD, dt);
-    }
-    if (Keyboard::key(GLFW_KEY_A)) {
-        Camera::defaultCamera.updateCameraPos(CameraDirection::LEFT, dt);
-    }
-    if (Keyboard::key(GLFW_KEY_S)) {
-        Camera::defaultCamera.updateCameraPos(CameraDirection::BACKWARD, dt);
-    }
-    if (Keyboard::key(GLFW_KEY_D)) {
-        Camera::defaultCamera.updateCameraPos(CameraDirection::RIGHT, dt);
-    }
-    if (Keyboard::key(GLFW_KEY_SPACE)) {
-        Camera::defaultCamera.updateCameraPos(CameraDirection::UP, dt);
-    }
-    if (Keyboard::key(GLFW_KEY_LEFT_SHIFT)) {
-        Camera::defaultCamera.updateCameraPos(CameraDirection::DOWN, dt);
-    }
-
-    double dx = Mouse::getDX(), dy = Mouse::getDY();
-    if (dx != 0 || dy != 0) {
-        Camera::defaultCamera.updateCameraDirection(dx, dy);
-    }
-
-    double scrollDy = Mouse::getScrollDY();
-    if (scrollDy != 0) {
-        Camera::defaultCamera.updateCameraZoom(scrollDy);
-    }
-
-	if (Keyboard::keyWentDown(GLFW_KEY_G)) {
+	if (Keyboard::keyWentDown(GLFW_KEY_F)) {
 		launchItem(dt);
 	}
 }

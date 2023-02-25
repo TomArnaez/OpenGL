@@ -1,17 +1,12 @@
-#ifndef CUBE_HPP
-#define CUBE_HPP
+#ifndef CUBE_H
+#define CUBE_H
 
 #include "../model.h"
-#include "../material.h"
+#include "../texture.h"
 
 class Cube : public Model {
 public:
-	glm::vec3 pos;
-	glm::vec3 size;
-
-    Material material;
-
-    Cube(glm::vec3 pos = glm::vec3(0.0f), glm::vec3 size = glm::vec3(1.0f))
+    Cube(glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 size = glm::vec3(1.0f, 1.0f, 1.0f))
         : Model(pos, size) {}
 
     void init() {
@@ -63,15 +58,14 @@ public:
         };
 
         std::vector<unsigned int> indices(noVertices);
-        for (int i = 0; i < noVertices; ++i) {
+        for (unsigned int i = 0; i < noVertices; i++) {
             indices[i] = i;
         }
 
-        /*Texture flag("assets/flag.jpg", "material.diffuse");
-        flag.load();
-        Texture flagSpec("assets/flag_specular.jpg", "material.specular");
-        flagSpec.load();
-        */
+        /*Texture tex("assets/flag.png", "material.diffuse");
+        tex.load();
+        Texture tex_specular("assets/flag_specular.png", "material.specular");
+        tex_specular.load();*/
 
         meshes.push_back(Mesh(Vertex::genList(vertices, noVertices), indices));
     }

@@ -1,3 +1,7 @@
+#ifndef LAMP_HPP
+#define LAMP_HPP
+
+#include "cube.hpp"
 #include "../material.h"
 #include "../shader.h"
 #include "../light.h"
@@ -8,7 +12,9 @@
 class Lamp : public Cube {
 public:
 	glm::vec3 lightColor;
+
 	PointLight pointLight;
+
 	Lamp(glm::vec3 lightColor = glm::vec3(1.0f),
 		glm::vec4 ambient = glm::vec4(1.0f),
 		glm::vec4 diffuse = glm::vec4(1.0f),
@@ -50,3 +56,5 @@ public:
 		}
 	}
 };
+
+#endif
