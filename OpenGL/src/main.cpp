@@ -206,7 +206,7 @@ int main() {
 
 void launchItem(float dt) {
 	RigidBody rb(1.0f, Camera::defaultCamera.cameraPos);
-	rb.applyImpulse(Camera::defaultCamera.cameraFront, 10000.0f, dt);
+	rb.transferEnergy(100.0f, Camera::defaultCamera.cameraFront);
 	rb.applyAcceleration(Environment::gravitationalAcceleration);
 	launchObjects.instances.push_back(rb);
 }
