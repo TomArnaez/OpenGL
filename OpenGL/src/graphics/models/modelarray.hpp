@@ -20,10 +20,30 @@ public:
 		glBindBuffer(GL_ARRAY_BUFFER, );
 
 		// generate size VBO
-		glBenBuffers(1, &sizeVBO);
+		glGenBuffers(1, &sizeVBO);
 		glBindBuffer(GL_ARRAY_BUFFER, sizeVBO);
 		glBufferData(GL_ARRAY_BUFFER, UPPER_BOUND * 3 * sizeof(Float), NULL, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		// set attribute pointers for each mesh
+		for (unsigned int i = 0, size = model.meshes.size(); i < size; i++) {
+			GlBindVertexArray(modelmeshes[i].VAO);
+			// positions
+			glBindBuffer(GL_ARRAY_BUFFER, posVBO);
+			glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+			glEnableVertexAttribArray(3));
+			// sizes
+			glBindBuffer(GL_ARRAY_BUFFER, sizeVBO);
+			glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+			glEnableVertexAttribArray(4);
+
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+			glVertexAttribDivisor(3, 1); // reset _3rd_ attribute every _1_ instance
+			glVertexAttribDivisor(4, 1); // reset _4th_ attribute every _1_ instance
+
+			glBindVertexArray(0);
+		}
 
 	}
 
