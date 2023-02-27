@@ -46,7 +46,7 @@ public:
 		}
 	}
 
-	void render(Shader shader, float dt, bool setLists = true) {
+	void render(Shader shader, float dt, bool setLists = true, unsigned int renderMode = GL_TRIANGLES) {
 		if (setLists) {
 			positions.clear();
 			sizes.clear();
@@ -80,7 +80,7 @@ public:
 		// render instanced data
 		for (unsigned int i = 0, length = model.meshes.size(); i < length; i++) {
 			glBindVertexArray(model.meshes[i].VAO);
-			glDrawElementsInstanced(GL_TRIANGLES, model.meshes[i].indices.size(), GL_UNSIGNED_INT, 0, size);
+			glDrawElementsInstanced(renderMode, model.meshes[i].indices.size(), GL_UNSIGNED_INT, 0, size);
 			glBindVertexArray(0);
 		}
 	}
