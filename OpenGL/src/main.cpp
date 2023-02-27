@@ -74,7 +74,7 @@ int main() {
 	// SHADERS===============================
 	Shader shader("assets/object.vs", "assets/object.fs");
 	Shader lampShader("assets/instanced/instanced.vs", "assets/lamp.fs");
-	Shader launchShader("assets/instanced/instanced.vs", "assets/objects.fs");
+	Shader launchShader("assets/instanced/instanced.vs", "assets/object.fs");
 	 
 	// MODELS========================== ====
 	launchObjects.init();
@@ -183,7 +183,9 @@ int main() {
 		*/
 
 		if (launchObjects.instances.size() > 0) {
-			launchObjects.render(shader, dt);
+			launchShader.setMat4("view", view);
+			launchShader.setMat4("projection", projection);
+			launchObjects.render(launchShader, dt);
 		}
 
 		lampShader.activate();
