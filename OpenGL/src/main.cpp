@@ -183,6 +183,7 @@ int main() {
 		*/
 
 		if (launchObjects.instances.size() > 0) {
+			launchShader.activate();
 			launchShader.setMat4("view", view);
 			launchShader.setMat4("projection", projection);
 			launchObjects.render(launchShader, dt);
