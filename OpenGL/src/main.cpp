@@ -73,9 +73,10 @@ int main() {
 
 	// SHADERS===============================
 	Shader shader("assets/object.vs", "assets/object.fs");
-	Shader lampShader("assets/object.vs", "assets/lamp.fs");
-
-	// MODELS==============================
+	Shader lampShader("assets/instanced/instanced.vs", "assets/lamp.fs");
+	Shader launchShader("assets/instanced/instanced.vs", "assets/objects.fs");
+	 
+	// MODELS========================== ====
 	launchObjects.init();
 
 	// LIGHTS
