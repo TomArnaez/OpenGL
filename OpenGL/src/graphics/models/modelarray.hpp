@@ -63,9 +63,11 @@ public:
 
 		model.render(shader, dt, false, false);
 
+		int size = std::min(UPPER_BOUND, (int)positions.size()); // if more than UPPER_BOUND instances, only render UPPER_BOUND
+
 		if (positions.size() != 0) {
 			// if instances exist
-			int size = std::min(UPPER_BOUND, (int) positions.size()); // if more than UPPER_BOUND instances, only render UPPER_BOUND
+
 
 			glBindBuffer(GL_ARRAY_BUFFER, posVBO);
 			glBufferSubData(GL_ARRAY_BUFFER, 0, size * 3 * sizeof(float), &positions[0]);
