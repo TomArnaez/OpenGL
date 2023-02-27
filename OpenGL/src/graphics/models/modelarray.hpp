@@ -16,22 +16,22 @@ public:
 		// generate positions
 		glGenBuffers(1, &posVBO);
 		glBindBuffer(GL_ARRAY_BUFFER, posVBO);
-		glBufferData(GL_ARRAY_BUFFER, UPPER_BOUND * 3 * sizeof(float), NULL), GL_DYNAMIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, );
+		glBufferData(GL_ARRAY_BUFFER, UPPER_BOUND * 3 * sizeof(float), NULL, GL_DYNAMIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		// generate size VBO
 		glGenBuffers(1, &sizeVBO);
 		glBindBuffer(GL_ARRAY_BUFFER, sizeVBO);
-		glBufferData(GL_ARRAY_BUFFER, UPPER_BOUND * 3 * sizeof(Float), NULL, GL_DYNAMIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, UPPER_BOUND * 3 * sizeof(float), NULL, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		// set attribute pointers for each mesh
 		for (unsigned int i = 0, size = model.meshes.size(); i < size; i++) {
-			GlBindVertexArray(modelmeshes[i].VAO);
+			glBindVertexArray(model.meshes[i].VAO);
 			// positions
 			glBindBuffer(GL_ARRAY_BUFFER, posVBO);
 			glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-			glEnableVertexAttribArray(3));
+			glEnableVertexAttribArray(3);
 			// sizes
 			glBindBuffer(GL_ARRAY_BUFFER, sizeVBO);
 			glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
@@ -47,12 +47,21 @@ public:
 
 	}
 
-	void render(Shader shader, float dt) {
-		for (RigidBody& rb : instances) {
-			rb.update(dt);
-			model.rb.pos = rb.pos;
-			model.render(shader, dt);
+	void render(Shader shader, float dt, bool setLists = true) {
+		if (setLists) {
+			positions.clear();
+			sizes.clear();
+
+			for (RigidBody& rb : instances) {
+				rb.update(dt);
+				positions.push_back(rb.pos);
+				sizes.push_back(model.size);
+			}
 		}
+
+		shader.setMat4("model", glm::mat4(1.0f));
+
+		model.render(shader, dt, false, false);
 	}
 
 	void setSize(glm::vec3 size) {
@@ -68,6 +77,9 @@ protected:
 
 	unsigned int posVBO;
 	unsigned int sizeVBO;
+
+	std::vector<glm::vec3> positions;
+	std::vector<glm::vec3> sizes;
 };
 
 #endif
