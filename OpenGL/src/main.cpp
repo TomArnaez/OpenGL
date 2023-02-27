@@ -18,6 +18,7 @@
 #include "graphics/models/lamp.hpp"
 #include "graphics/models/gun.hpp"
 #include "graphics/models/sphere.hpp"
+#include "graphics/models/box.hpp"
 
 #include "physics/environment.h"
 
@@ -34,6 +35,8 @@ Camera Camera::defaultCamera(glm::vec3(0.0f, 0.0f, 0.0f));
 
 double dt = 0.0f; // tme btwn frames
 double lastFrame = 0.0f; // time of last frame
+
+Box box;
 
 bool flashlightOn = false;
 
@@ -75,9 +78,11 @@ int main() {
 	Shader shader("assets/object.vs", "assets/object.fs");
 	Shader lampShader("assets/instanced/instanced.vs", "assets/lamp.fs");
 	Shader launchShader("assets/instanced/instanced.vs", "assets/object.fs");
+	Shader boxShader("assets/instanced/box.vs", "assets/instanced/box.fs");
 	 
 	// MODELS========================== ====
 	launchObjects.init();
+	box.init();
 
 	// LIGHTS
 	DirLight dirLight = { glm::vec3(-0.2f, -1.0f, -0.3f), glm::vec4(0.1f, 0.1f, 0.1f, 1.0f), glm::vec4(0.4f, 0.4f, 0.4f, 1.0f), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f) };
@@ -200,12 +205,22 @@ int main() {
 
 		lamps.render(lampShader, dt);
 
+		// render boxes
+		if (box.offsets.size() > 0) {
+			// instances exist
+			boxShader.activate();
+			boxShader.setMat4("view", view);
+			boxShader.setMat4("projection", projection);
+			box.render(boxShader);
+		}
+
 		// send new frame to window
 		screen.newFrame();
 		glfwPollEvents();
 	}
 
 	lamps.cleanup();
+	box.cleanup();
 
 	launchObjects.cleanup();
 
@@ -251,5 +266,10 @@ void processInput(double dt) {
 
 	if (Keyboard::keyWentDown(GLFW_KEY_F)) {
 		launchItem(dt);
+	}
+
+	if (Keyboard::keyWentDown(GLFW_KEY_I)) {
+		box.offsets.push_back(glm::vec3(box.offsets.size() * 1.0f));
+		box.sizes.push_back(glm::vec3(box.sizes.size() * 0.5f));
 	}
 }

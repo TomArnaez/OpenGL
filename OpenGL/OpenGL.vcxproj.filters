@@ -73,6 +73,8 @@
     <None Include="assets\object.vs" />
     <None Include="assets\lamp.fs" />
     <None Include="assets\instanced\instanced.vs" />
+    <None Include="assets\instanced\box.vs" />
+    <None Include="assets\instanced\box.fs" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\graphics\shader.h">

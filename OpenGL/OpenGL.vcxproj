@@ -151,7 +151,9 @@
     <ClCompile Include="src\physics\rigidbody.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="assets\instanced\box.vs" />
     <None Include="assets\instanced\instanced.vs" />
+    <None Include="assets\instanced\box.fs" />
     <None Include="assets\lamp.fs" />
     <None Include="assets\object.fs" />
     <None Include="assets\object.vs" />
