@@ -62,25 +62,25 @@ public:
         VAO["EBO"].setData<GLuint>(indices.size(), &indices[0], GL_STATIC_DRAW);
 
         // generate VBO
-        VAO["VAO"] = BufferObject(GL_ARRAY_BUFFER);
+        VAO["VBO"] = BufferObject(GL_ARRAY_BUFFER);
         VAO["VBO"].generate();
         VAO["VBO"].bind();
         VAO["VBO"].setData<GLfloat>(vertices.size(), &vertices[0], GL_STATIC_DRAW);
         VAO["VBO"].setAttPointer<GLfloat>(0, 3, GL_FLOAT, 3, 0);
 
         // position VBO - dynamic
-        VAO["VBO"] = BufferObject(GL_ARRAY_BUFFER);
+        VAO["posVBO"] = BufferObject(GL_ARRAY_BUFFER);
         VAO["posVBO"].generate();
         VAO["posVBO"].bind();
         VAO["posVBO"].setData<glm::vec3>(UPPER_BOUND, NULL, GL_DYNAMIC_DRAW);
         VAO["posVBO"].setAttPointer<glm::vec3>(1, 3, GL_FLOAT, 1, 0, 1);
 
-        // size
-        VAO["VBO"] = BufferObject(GL_ARRAY_BUFFER);
+        // size VBO - dynamic
+        VAO["sizeVBO"] = BufferObject(GL_ARRAY_BUFFER);
         VAO["sizeVBO"].generate();
         VAO["sizeVBO"].bind();
         VAO["sizeVBO"].setData<glm::vec3>(UPPER_BOUND, NULL, GL_DYNAMIC_DRAW);
-        VAO["sizeVBO"].setAttPointer<glm::vec3>(1, 3, GL_FLOAT, 1, 0, 1);
+        VAO["sizeVBO"].setAttPointer<glm::vec3>(2, 3, GL_FLOAT, 1, 0, 1);
         VAO["sizeVBO"].clear();
 
         ArrayObject::clear();
@@ -102,16 +102,17 @@ public:
 
             VAO["sizeVBO"].bind();
             VAO["sizeVBO"].updateData<glm::vec3>(0, instances, &sizes[0]);
-
         }
 
-        // render instanced data
+        // render data
         VAO.bind();
         VAO.draw(GL_LINES, indices.size(), GL_UNSIGNED_INT, 0, instances);
+        ArrayObject::clear();
     }
 
     void addInstance(BoundingRegion br, glm::vec3 pos, glm::vec3 size) {
         positions.push_back(br.calculateCentre() * size + pos);
+
         sizes.push_back(br.calculateDimensions() * size);
     }
 
