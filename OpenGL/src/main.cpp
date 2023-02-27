@@ -137,24 +137,30 @@ int main() {
 
 		// draw shapes
 		shader.activate();
+		launchShader.activate();
 
 		shader.set3Float("viewPos", Camera::defaultCamera.cameraPos);
+		launchShader.set3Float("viewPos", Camera::defaultCamera.cameraPos);
 
 		dirLight.render(shader);
 
 		for (unsigned int i = 0; i < 4; i++) {
 			lamps.lightInstances[i].render(shader, i);
+			lamps.lightInstances[i].render(launchShader, i);
 		}
 		shader.setInt("noPointLights", 4);
+		launchShader.setInt("noPointLights", 4);
 
 		if (flashlightOn) {
 			s.position = Camera::defaultCamera.cameraPos;
 			s.direction = Camera::defaultCamera.cameraFront;
 			s.render(shader, 0);
 			shader.setInt("noSpotLights", 1);
+			launchShader.setInt("noSpotLights", 1);
 		}
 		else {
 			shader.setInt("noSpotLights", 0);
+			launchShader.setInt("noSpotLights", 0);
 		}
 
 		// create transformation
@@ -183,7 +189,6 @@ int main() {
 		*/
 
 		if (launchObjects.instances.size() > 0) {
-			launchShader.activate();
 			launchShader.setMat4("view", view);
 			launchShader.setMat4("projection", projection);
 			launchObjects.render(launchShader, dt);
