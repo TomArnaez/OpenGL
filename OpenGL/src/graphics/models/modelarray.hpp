@@ -13,7 +13,7 @@ public:
 	void init() {
 		model.init();
 
-		// generate positions
+		// generate positions VBO
 		glGenBuffers(1, &posVBO);
 		glBindBuffer(GL_ARRAY_BUFFER, posVBO);
 		glBufferData(GL_ARRAY_BUFFER, UPPER_BOUND * 3 * sizeof(float), NULL, GL_DYNAMIC_DRAW);
@@ -44,7 +44,6 @@ public:
 
 			glBindVertexArray(0);
 		}
-
 	}
 
 	void render(Shader shader, float dt, bool setLists = true) {
@@ -63,11 +62,11 @@ public:
 
 		model.render(shader, dt, false, false);
 
-		int size = std::min(UPPER_BOUND, (int)positions.size()); // if more than UPPER_BOUND instances, only render UPPER_BOUND
+		int size = std::min(UPPER_BOUND, (int)positions.size()); // if more than 100 instances, only render 100
 
-		if (positions.size() != 0) {
+		// update data
+		if (size != 0) {
 			// if instances exist
-
 
 			glBindBuffer(GL_ARRAY_BUFFER, posVBO);
 			glBufferSubData(GL_ARRAY_BUFFER, 0, size * 3 * sizeof(float), &positions[0]);
@@ -79,7 +78,7 @@ public:
 		}
 
 		// render instanced data
-		for (unsigned int i = 0, length = model.meshes.size(); i < length; ++i) {
+		for (unsigned int i = 0, length = model.meshes.size(); i < length; i++) {
 			glBindVertexArray(model.meshes[i].VAO);
 			glDrawElementsInstanced(GL_TRIANGLES, model.meshes[i].indices.size(), GL_UNSIGNED_INT, 0, size);
 			glBindVertexArray(0);
@@ -99,7 +98,6 @@ protected:
 
 	unsigned int posVBO;
 	unsigned int sizeVBO;
-
 	std::vector<glm::vec3> positions;
 	std::vector<glm::vec3> sizes;
 };

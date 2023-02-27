@@ -5,6 +5,8 @@ struct Material {
 	float shininess;
 };
 
+uniform int noTex;
+
 uniform sampler2D diffuse0;
 uniform sampler2D specular0;
 
@@ -48,7 +50,7 @@ struct SpotLight {
 	float k1;
 	float k2;
 };
-uniform SpotLight spotLights[5];
+uniform SpotLight spotLights[MAX_SPOT_LIGHTS];
 uniform int noSpotLights;
 
 out vec4 FragColor;
@@ -58,7 +60,6 @@ in vec3 Normal;
 in vec2 TexCoord;
 
 uniform Material material;
-uniform int noTex;
 
 uniform vec3 viewPos;
 
@@ -70,6 +71,7 @@ void main() {
 	// properties
 	vec3 norm = normalize(Normal);
 	vec3 viewDir = normalize(viewPos - FragPos);
+
 	vec4 texDiff;
 	vec4 texSpec;
 
@@ -81,7 +83,6 @@ void main() {
 		texSpec = texture(specular0, TexCoord);
 	}
 
-	// placeholder
 	vec4 result;
 
 	// directional
