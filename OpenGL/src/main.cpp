@@ -132,7 +132,7 @@ int main() {
 
 
 	while (!screen.shouldClose()) {
-		box.offsets.clear();
+		box.positions.clear();
 		box.sizes.clear();
 
 		// calculate dt
@@ -230,7 +230,7 @@ int main() {
 		lamps.render(lampShader, dt, &box);
 
 		// render boxes
-		if (box.offsets.size() > 0) {
+		if (box.positions.size() > 0) {
 			// instances exist
 			boxShader.activate();
 			boxShader.setMat4("view", view);
