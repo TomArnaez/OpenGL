@@ -36,9 +36,9 @@ Camera Camera::defaultCamera(glm::vec3(0.0f, 0.0f, 0.0f));
 double dt = 0.0f; // tme btwn frames
 double lastFrame = 0.0f; // time of last frame
 
-Box box;
-
 bool flashlightOn = false;
+
+Box box;
 
 SphereArray launchObjects;
 
@@ -82,7 +82,11 @@ int main() {
 	 
 	// MODELS========================== ====
 	launchObjects.init();
+
 	box.init();
+
+	Model m(BoundTypes::AABB, glm::vec3(0.0f), glm::vec3(0.05f));
+	m.loadModel("assets/models/lotr_troll/scene.gltf");
 
 	// LIGHTS
 	DirLight dirLight = { glm::vec3(-0.2f, -1.0f, -0.3f), glm::vec4(0.1f, 0.1f, 0.1f, 1.0f), glm::vec4(0.4f, 0.4f, 0.4f, 1.0f), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f) };
@@ -144,27 +148,42 @@ int main() {
 		shader.activate();
 		launchShader.activate();
 
+		shader.activate();
 		shader.set3Float("viewPos", Camera::defaultCamera.cameraPos);
+		launchShader.activate();
 		launchShader.set3Float("viewPos", Camera::defaultCamera.cameraPos);
 
+		shader.activate();
 		dirLight.render(shader);
+		launchShader.activate();
+		dirLight.render(launchShader);
 
 		for (unsigned int i = 0; i < 4; i++) {
+			shader.activate();
 			lamps.lightInstances[i].render(shader, i);
+			launchShader.activate();
 			lamps.lightInstances[i].render(launchShader, i);
 		}
-		shader.setInt("noPointLights", 4);
-		launchShader.setInt("noPointLights", 4);
 
+		shader.activate();
+		shader.setInt("noPointLights", 4);
+		launchShader.activate();
+		launchShader.setInt("noPointLights", 4);
+		 
 		if (flashlightOn) {
 			s.position = Camera::defaultCamera.cameraPos;
 			s.direction = Camera::defaultCamera.cameraFront;
+			shader.activate();
 			s.render(shader, 0);
 			shader.setInt("noSpotLights", 1);
+			launchShader.activate();
+			s.render(launchShader, 0);
 			launchShader.setInt("noSpotLights", 1);
 		}
 		else {
+			shader.activate();
 			shader.setInt("noSpotLights", 0);
+			launchShader.activate();
 			launchShader.setInt("noSpotLights", 0);
 		}
 
@@ -176,8 +195,10 @@ int main() {
 			glm::radians(Camera::defaultCamera.zoom),
 			(float)Screen::SCR_WIDTH / (float)Screen::SCR_HEIGHT, 0.1f, 100.0f);
 
+		shader.activate();
 		shader.setMat4("view", view);
 		shader.setMat4("projection", projection);
+		m.render(shader, dt);
 
 		/*
 		std::stack<int> removeObjects;
@@ -194,6 +215,7 @@ int main() {
 		*/
 
 		if (launchObjects.instances.size() > 0) {
+			launchShader.activate();
 			launchShader.setMat4("view", view);
 			launchShader.setMat4("projection", projection);
 			launchObjects.render(launchShader, dt);
