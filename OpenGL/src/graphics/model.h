@@ -15,6 +15,8 @@
 
 #include "mesh.h"
 
+#include "models/box.hpp"
+
 #include "../physics/rigidbody.h"
 #include "../algorithms/bounds.h"
 
@@ -31,7 +33,7 @@ public:
 
 	void loadModel(std::string path);
 
-	void render(Shader shader, float dt, bool setModel = true, bool doRender = true);
+	void render(Shader shader, float dt, Box *box, bool setModel = true, bool doRender = true);
 
 	void cleanup();
 

@@ -38,8 +38,6 @@ double lastFrame = 0.0f; // time of last frame
 
 bool flashlightOn = false;
 
-Box box;
-
 SphereArray launchObjects;
 
 int main() {
@@ -83,6 +81,7 @@ int main() {
 	// MODELS========================== ====
 	launchObjects.init();
 
+	Box box;
 	box.init();
 
 	Model m(BoundTypes::AABB, glm::vec3(0.0f), glm::vec3(0.05f));
@@ -133,6 +132,9 @@ int main() {
 
 
 	while (!screen.shouldClose()) {
+		box.offsets.clear();
+		box.sizes.clear();
+
 		// calculate dt
 		double currentTime = glfwGetTime();
 		dt = currentTime - lastFrame;
@@ -198,7 +200,7 @@ int main() {
 		shader.activate();
 		shader.setMat4("view", view);
 		shader.setMat4("projection", projection);
-		m.render(shader, dt);
+		m.render(shader, dt, &box);
 
 		/*
 		std::stack<int> removeObjects;
@@ -218,14 +220,14 @@ int main() {
 			launchShader.activate();
 			launchShader.setMat4("view", view);
 			launchShader.setMat4("projection", projection);
-			launchObjects.render(launchShader, dt);
+			launchObjects.render(launchShader, dt, &box);
 		}
 
 		lampShader.activate();
 		lampShader.setMat4("view", view);
 		lampShader.setMat4("projection", projection);
 
-		lamps.render(lampShader, dt);
+		lamps.render(lampShader, dt, &box);
 
 		// render boxes
 		if (box.offsets.size() > 0) {
@@ -288,10 +290,5 @@ void processInput(double dt) {
 
 	if (Keyboard::keyWentDown(GLFW_KEY_F)) {
 		launchItem(dt);
-	}
-
-	if (Keyboard::keyWentDown(GLFW_KEY_I)) {
-		box.offsets.push_back(glm::vec3(box.offsets.size() * 1.0f));
-		box.sizes.push_back(glm::vec3(box.sizes.size() * 0.5f));
 	}
 }

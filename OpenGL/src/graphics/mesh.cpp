@@ -39,7 +39,7 @@ Mesh::Mesh(BoundingRegion br, std::vector<Vertex> vertices, std::vector<unsigned
 	setup();
 }
 
-void Mesh::render(Shader shader, bool doRender = true)
+void Mesh::render(Shader shader, glm::vec3 pos, glm::vec3 size, Box *box, bool doRender = true)
 {
 	if (noTex) {
 		// materials
@@ -74,6 +74,7 @@ void Mesh::render(Shader shader, bool doRender = true)
 		}
 	}
 	if (doRender) {
+		box->addInstance(br, pos, size);
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);

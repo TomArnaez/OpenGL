@@ -9,7 +9,7 @@ Model::Model(BoundTypes boundType, glm::vec3 pos, glm::vec3 size, bool noTex)
 	rb.pos = pos;
 }
 
-void Model::render(Shader shader, float dt, bool setModel, bool doRender) {
+void Model::render(Shader shader, float dt, Box *box, bool setModel, bool doRender) {
 	rb.update(dt);
 
 	if (setModel) {
@@ -18,11 +18,11 @@ void Model::render(Shader shader, float dt, bool setModel, bool doRender) {
 		model = glm::scale(model, size);
 		shader.setMat4("model", model);
 	}
-
+	 
 	shader.setFloat("material.shininess", 0.5f);
 
 	for (unsigned int i = 0; i < meshes.size(); i++) {
-		meshes[i].render(shader, doRender);
+		meshes[i].render(shader, rb.pos, size, box, doRender);
 	}
 }
 
