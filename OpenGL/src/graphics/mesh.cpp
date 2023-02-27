@@ -75,48 +75,84 @@ void Mesh::render(Shader shader, glm::vec3 pos, glm::vec3 size, Box *box, bool d
 	}
 	if (doRender) {
 		box->addInstance(br, pos, size);
-		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-		glBindVertexArray(0);
+
+		//glBindVertexArray(VAO);
+		VAO.bind();
+		VAO.draw(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+		//glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+		//glBindVertexArray(0);
+		ArrayObject::clear();
 
 		glActiveTexture(GL_TEXTURE0);
 	}
 }
 
-void Mesh::cleanup()
-{
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
-	glDeleteBuffers(1, &EBO);
-}
 
 void Mesh::setup()
 {
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
+	//glGenVertexArrays(1, &VAO);
+	//glGenBuffers(1, &VBO);
+	//glGenBuffers(1, &EBO);
 
-	glBindVertexArray(VAO);
+	//glBindVertexArray(VAO);
 
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
+	//glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	//glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 
-	// set vertex attribute pointers
-	// vertex.position
+	//// set vertex attribute pointers
+	//// vertex.position
 
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+	//glEnableVertexAttribArray(0);
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
 
-	// vertex.normal
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+	//// vertex.normal
+	//glEnableVertexAttribArray(1);
+	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 
-	// vertex.texCoord
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoord));
+	//// vertex.texCoord
+	//glEnableVertexAttribArray(2);
+	//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoord));
 
-	glBindVertexArray(0);
+	//glBindVertexArray(0);
+
+	// bind VAO
+	VAO.generate();
+	VAO.bind();
+
+	// generate/set EBO
+	VAO["EBO"] = BufferObject(GL_ELEMENT_ARRAY_BUFFER);
+	VAO["EBO"].generate();
+	VAO["EBO"].bind();
+	VAO["EBO"].setData<GLuint>(indices.size(), &indices[0], GL_STATIC_DRAW);
+
+	// generate/set VBO
+	VAO["VBO"] = BufferObject(GL_ARRAY_BUFFER);
+	VAO["VBO"].generate();
+	VAO["VBO"].bind();
+	VAO["VBO"].setData<Vertex>(vertices.size(), &vertices[0], GL_STATIC_DRAW);
+
+	// set vertex attrib pointers
+	// vertex positions
+	VAO["VBO"].setAttPointer<GLfloat>(0, 3, GL_FLOAT, 8, 0);
+	// normal ray
+	VAO["VBO"].setAttPointer<GLfloat>(1, 3, GL_FLOAT, 8, 3);
+	// textures coordinates
+	VAO["VBO"].setAttPointer<GLfloat>(2, 2, GL_FLOAT, 8, 6);
+
+	VAO["VBO"].clear();
+
+	ArrayObject::clear();
+
+}
+
+void Mesh::cleanup()
+{
+	//glDeleteVertexArrays(1, &VAO);
+	//glDeleteBuffers(1, &VBO);
+	//glDeleteBuffers(1, &EBO);
+
+	VAO.cleanup();
 }

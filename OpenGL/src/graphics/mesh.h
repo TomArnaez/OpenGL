@@ -10,6 +10,7 @@
 
 #include "shader.h"
 #include "texture.h"
+#include "glmemory.hpp"
 
 #include "models/box.hpp"
 
@@ -30,7 +31,7 @@ public:
 
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
-	unsigned int VAO;
+	ArrayObject VAO;
 
 	std::vector<Texture> textures;
 	aiColor4D diffuse;

@@ -59,7 +59,6 @@ public:
 
 		ModelArray::render(shader, dt, box ,false);
 	}
-
 };
 
 #endif
