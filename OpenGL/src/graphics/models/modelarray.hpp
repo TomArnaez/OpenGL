@@ -62,6 +62,26 @@ public:
 		shader.setMat4("model", glm::mat4(1.0f));
 
 		model.render(shader, dt, false, false);
+
+		if (positions.size() != 0) {
+			// if instances exist
+			int size = std::min(UPPER_BOUND, (int) positions.size()); // if more than UPPER_BOUND instances, only render UPPER_BOUND
+
+			glBindBuffer(GL_ARRAY_BUFFER, posVBO);
+			glBufferSubData(GL_ARRAY_BUFFER, 0, size * 3 * sizeof(float), &positions[0]);
+
+			glBindBuffer(GL_ARRAY_BUFFER, sizeVBO);
+			glBufferSubData(GL_ARRAY_BUFFER, 0, size * 3 * sizeof(float), &sizes[0]);
+
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		}
+
+		// render instanced data
+		for (unsigned int i = 0, length = model.meshes.size(); i < length; ++i) {
+			glBindVertexArray(model.meshes[i].VAO);
+			glDrawElementsInstanced(GL_TRIANGLES, model.meshes[i].indices.size(), GL_UNSIGNED_INT, 0, size);
+			glBindVertexArray(0);
+		}
 	}
 
 	void setSize(glm::vec3 size) {
