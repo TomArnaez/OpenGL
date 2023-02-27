@@ -123,6 +123,9 @@
     <ClInclude Include="src\graphics\models\modelarray.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\graphics\models\box.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\image1.jpg">
