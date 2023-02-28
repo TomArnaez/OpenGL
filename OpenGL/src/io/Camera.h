@@ -16,8 +16,6 @@ enum class CameraDirection {
 
 class Camera {
 public:
-	static Camera defaultCamera;
-
 	glm::vec3 cameraPos;
 
 	glm::vec3 cameraFront;
@@ -32,7 +30,7 @@ public:
 	float sensitivity;
 	float zoom;
 
-	Camera(glm::vec3 pos);
+	Camera(glm::vec3 pos = glm::vec3(0.0f));
 
 	void updateCameraDirection(double dx, double dy);
 	void updateCameraPos(CameraDirection dir, double dt);

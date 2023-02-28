@@ -51,6 +51,8 @@ void Camera::updateCameraPos(CameraDirection direction, double dt) {
 		cameraPos -= cameraUp * velocity;
 		break;
 	}
+
+
 }
 
 void Camera::updateCameraZoom(double dy) {

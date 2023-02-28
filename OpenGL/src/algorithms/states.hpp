@@ -7,7 +7,7 @@ namespace States {
 	*/
 	// check state
 	template<typename T>
-	bool isAcive(T* states, int target) {
+	bool isActive(T* states, int target) {
 		/*
 			target = 3
 			1 = 00000001
@@ -19,7 +19,7 @@ namespace States {
 			00001000 == 1 << target
 
 		*/
-		return (*states & (1 << target) == (1 << target));
+		return (*states & (1 << target)) == (1 << target);
 	}
 
 	// activate state
@@ -36,7 +36,7 @@ namespace States {
 			10011101
 
 		*/
-		* states |= 1 << target;
+		*states |= 1 << target;
 	}
 
 	// uniquely activate state (no others can be active)
